@@ -1,15 +1,620 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hello World</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUGANGO250 - Rwandan Fashion Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFDE59', // Yellow
+                        secondary: '#00C853', // Green
+                        dark: '#121212',     // Almost black
+                        darkLight: '#1E1E1E', // Slightly lighter black
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+        }
+        
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #1E1E1E;
+            border: 1px solid rgba(255, 222, 89, 0.1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(255, 222, 89, 0.2);
+            border-color: #FFDE59;
+        }
+        
+        .img-hover-zoom {
+            overflow: hidden;
+        }
+        
+        .img-hover-zoom img {
+            transition: transform 0.5s ease;
+        }
+        
+        .img-hover-zoom:hover img {
+            transform: scale(1.1);
+        }
+        
+        .loader {
+            border: 3px solid rgba(255, 222, 89, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #FFDE59;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .whatsapp-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1E1E1E;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #FFDE59;
+            border-radius: 3px;
+        }
+        
+        .featured-tag {
+            background: #00C853;
+            color: white;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 10;
+        }
+        
+        .btn-primary {
+            background-color: #FFDE59;
+            color: #121212;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #FFD000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 222, 89, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #00C853;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #00B84A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #00C853, #FFDE59);
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-  <h1 id="greeting">Hello, World!</h1>
-  <button onclick="changeMessage()">Click Me</button>
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-dark shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                        <span class="text-primary font-bold text-xl md:text-2xl">RUGANGO<span class="text-secondary">250</span></span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-primary">Home</a>
+                    <a href="#featured" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-primary">Featured</a>
+                    <a href="#products" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-primary">Products</a>
+                    <a href="#contact" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-primary">Contact</a>
+                </div>
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-primary">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-darkLight shadow-inner">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-primary">Home</a>
+                <a href="#featured" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-primary">Featured</a>
+                <a href="#products" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-primary">Products</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-primary">Contact</a>
+            </div>
+        </div>
+    </nav>
 
-  <script src="index.js"></script>
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-20 pb-32 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                        <span class="text-white">Exclusive</span> 
+                        <span class="text-primary">Fashion</span> 
+                        <span class="text-white">from</span>
+                        <span class="text-secondary">Rwanda</span>
+                    </h1>
+                    <p class="text-lg text-gray-300 mb-8">Discover our premium collection of clothing and shoes made with quality materials and authentic Rwandan craftsmanship.</p>
+                    <div class="flex space-x-4">
+                        <a href="#products" class="btn-primary font-semibold px-6 py-3 rounded-lg">
+                            Explore Collection
+                        </a>
+                        <a href="#contact" class="btn-secondary font-semibold px-6 py-3 rounded-lg">
+                            Contact Us
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="relative">
+                        <div class="absolute -top-4 -left-4 w-24 h-24 bg-primary rounded-full opacity-30 blur-lg"></div>
+                        <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-secondary rounded-full opacity-30 blur-lg"></div>
+                        <img src="https://i.ibb.co/WWzk7R37/image.png" alt="Fashion Showcase" class="w-full h-auto rounded-lg shadow-2xl">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section id="featured" class="py-16 bg-darkLight">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center text-white mb-12">Featured Products</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Featured Product 1 -->
+                <div class="relative overflow-hidden rounded-xl shadow-xl">
+                    <span class="featured-tag">New Arrival</span>
+                    <div class="img-hover-zoom h-96">
+                        <img src="https://i.ibb.co/nN5Kh9qz/Whats-App-Image-2025-05-25-at-13-34-19-325af914.jpg" alt="Featured Product" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black to-transparent">
+                        <h3 class="text-xl font-bold text-white mb-2">Premium Collection</h3>
+                        <p class="text-gray-300 mb-4">Exclusive styles for the modern fashion enthusiast</p>
+                        <button class="contact-button btn-primary font-medium py-2 px-6 rounded-lg" data-product="Premium Collection">
+                            Get Details
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Featured Product 2 -->
+                <div class="relative overflow-hidden rounded-xl shadow-xl">
+                    <span class="featured-tag">Best Seller</span>
+                    <div class="img-hover-zoom h-96">
+                        <img src="https://i.ibb.co/C5vSV4bt/image.png" alt="Featured Product" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black to-transparent">
+                        <h3 class="text-xl font-bold text-white mb-2">Summer Collection</h3>
+                        <p class="text-gray-300 mb-4">Light and stylish outfits for the season</p>
+                        <button class="contact-button btn-primary font-medium py-2 px-6 rounded-lg" data-product="Summer Collection">
+                            Get Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center text-white mb-12">Our Collection</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="product-card rounded-xl overflow-hidden">
+                    <div class="img-hover-zoom h-64">
+                        <img src="https://i.ibb.co/NQYxFK6/image.png" alt="Stylish Shoes" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-2 text-white">Classic Sneakers</h3>
+                        <p class="text-gray-400 mb-4">Premium quality sneakers for everyday comfort.</p>
+                        <button class="contact-button w-full btn-primary font-medium py-2 px-4 rounded-lg" data-product="Classic Sneakers">
+                            Contact Us
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card rounded-xl overflow-hidden">
+                    <div class="img-hover-zoom h-64">
+                        <img src="https://i.ibb.co/C5vSV4bt/image.png" alt="Elegant Dress" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-2 text-white">Elegant Dress</h3>
+                        <p class="text-gray-400 mb-4">Stunning dress for special occasions.</p>
+                        <button class="contact-button w-full btn-primary font-medium py-2 px-4 rounded-lg" data-product="Elegant Dress">
+                            Contact Us
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card rounded-xl overflow-hidden">
+                    <div class="img-hover-zoom h-64">
+                        <img src="https://i.ibb.co/Df4R3SSp/image.png" alt="Modern Outfit" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-2 text-white">Stylish Outfit</h3>
+                        <p class="text-gray-400 mb-4">Trendy and comfortable outfit for any occasion.</p>
+                        <button class="contact-button w-full btn-primary font-medium py-2 px-4 rounded-lg" data-product="Stylish Outfit">
+                            Contact Us
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card rounded-xl overflow-hidden">
+                    <div class="img-hover-zoom h-64">
+                        <img src="https://i.ibb.co/hRkr910z/image.png" alt="Casual Outfit" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-2 text-white">Casual Outfit</h3>
+                        <p class="text-gray-400 mb-4">Comfortable and stylish casual wear.</p>
+                        <button class="contact-button w-full btn-primary font-medium py-2 px-4 rounded-lg" data-product="Casual Outfit">
+                            Contact Us
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product 5 -->
+                <div class="product-card rounded-xl overflow-hidden">
+                    <div class="img-hover-zoom h-64">
+                        <img src="https://i.ibb.co/0jNMFPkc/image.png" alt="Stylish Footwear" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-2 text-white">Stylish Footwear</h3>
+                        <p class="text-gray-400 mb-4">Elegant and comfortable footwear collection.</p>
+                        <button class="contact-button w-full btn-primary font-medium py-2 px-4 rounded-lg" data-product="Stylish Footwear">
+                            Contact Us
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product 6 -->
+                <div class="product-card rounded-xl overflow-hidden">
+                    <div class="img-hover-zoom h-64">
+                        <img src="https://i.ibb.co/WWzk7R37/image.png" alt="Fashion Set" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-2 text-white">Fashion Set</h3>
+                        <p class="text-gray-400 mb-4">Complete fashion set for a perfect look.</p>
+                        <button class="contact-button w-full btn-primary font-medium py-2 px-4 rounded-lg" data-product="Fashion Set">
+                            Contact Us
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="py-12 bg-gradient-to-r from-secondary to-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-dark mb-6">Ready to Upgrade Your Style?</h2>
+            <p class="text-dark text-lg mb-8 max-w-3xl mx-auto">Discover our exclusive collection and get personalized style advice from our fashion experts.</p>
+            <a href="#contact" class="inline-block bg-dark text-white font-semibold px-8 py-3 rounded-lg hover:bg-darkLight transition duration-300">
+                Contact Us Today
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-darkLight">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-center text-white mb-12">Get in Touch</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="bg-dark rounded-xl shadow-xl p-8">
+                    <h3 class="text-2xl font-semibold mb-6 text-primary">Contact Information</h3>
+                    <p class="text-gray-300 mb-8">Have questions about our products? We're here to help you find the perfect style for any occasion.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 bg-secondary bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-secondary"></i>
+                            </div>
+                            <span class="ml-4 text-gray-300">Kigali, Rwanda</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 bg-secondary bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-phone text-secondary"></i>
+                            </div>
+                            <span class="ml-4 text-gray-300">+250 724 285 570</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 bg-secondary bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-envelope text-secondary"></i>
+                            </div>
+                            <span class="ml-4 text-gray-300">info@rugango250.com</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10">
+                        <a href="https://wa.me/250724285570" class="whatsapp-pulse inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-lg transition duration-300">
+                            <i class="fab fa-whatsapp mr-2 text-xl"></i>
+                            Chat on WhatsApp
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-dark rounded-xl shadow-xl p-8">
+                    <h3 class="text-2xl font-semibold mb-6 text-primary">Send a Message</h3>
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-3 bg-darkLight border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-primary focus:border-primary" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-3 bg-darkLight border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-primary focus:border-primary" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                            <textarea id="message" name="message" rows="4" class="w-full px-4 py-3 bg-darkLight border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-primary focus:border-primary" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full btn-primary font-medium py-3 px-4 rounded-lg">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for contact -->
+    <div id="contact-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center hidden">
+        <div class="bg-dark rounded-xl shadow-2xl max-w-md w-full mx-4 border border-primary">
+            <div class="p-5 border-b border-gray-800">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-semibold text-primary" id="modal-title">Contact About Product</h3>
+                    <button id="close-modal" class="text-gray-400 hover:text-white">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-300 mb-6">
+                    You're interested in <span id="product-name" class="font-semibold text-primary"></span>. 
+                    How would you like to contact us?
+                </p>
+                <div class="space-y-4">
+                    <button id="whatsapp-button" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-3 rounded-lg transition duration-300">
+                        <i class="fab fa-whatsapp mr-2 text-xl"></i>
+                        Chat on WhatsApp
+                    </button>
+                    <button id="poe-chat-button" class="w-full flex items-center justify-center bg-primary hover:bg-yellow-400 text-dark font-medium px-4 py-3 rounded-lg transition duration-300">
+                        <i class="fas fa-comment-dots mr-2"></i>
+                        <span id="poe-button-text">Talk to Us Now</span>
+                        <span id="poe-loading" class="hidden"><span class="loader"></span>Connecting...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-8 md:mb-0">
+                    <span class="text-primary font-bold text-2xl">RUGANGO<span class="text-secondary">250</span></span>
+                    <p class="mt-2 text-gray-400 text-sm">Premium Fashion from Rwanda to the World</p>
+                </div>
+                <div class="flex space-x-8">
+                    <a href="#" class="text-gray-400 hover:text-primary transition duration-300">
+                        <i class="fab fa-facebook-f text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition duration-300">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition duration-300">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="https://wa.me/250724285570" class="text-gray-400 hover:text-green-500 transition duration-300">
+                        <i class="fab fa-whatsapp text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-10 border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+                &copy; 2025 RUGANGO250. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Contact form submission
+        const contactForm = document.getElementById('contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            // Here you would typically send the form data to a server
+            // For now, we'll just show an alert
+            alert(`Thank you ${name}! Your message has been received. We'll get back to you soon.`);
+            contactForm.reset();
+        });
+        
+        // Modal functionality
+        const contactModal = document.getElementById('contact-modal');
+        const closeModal = document.getElementById('close-modal');
+        const productName = document.getElementById('product-name');
+        const modalTitle = document.getElementById('modal-title');
+        const contactButtons = document.querySelectorAll('.contact-button');
+        const whatsappButton = document.getElementById('whatsapp-button');
+        const poeChatButton = document.getElementById('poe-chat-button');
+        const poeButtonText = document.getElementById('poe-button-text');
+        const poeLoading = document.getElementById('poe-loading');
+        
+        // Open modal when contact button is clicked
+        contactButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const product = button.getAttribute('data-product');
+                productName.textContent = product;
+                modalTitle.textContent = `Contact About ${product}`;
+                contactModal.classList.remove('hidden');
+            });
+        });
+        
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            contactModal.classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) {
+                contactModal.classList.add('hidden');
+            }
+        });
+        
+        // WhatsApp button functionality
+        whatsappButton.addEventListener('click', () => {
+            const product = productName.textContent;
+            const message = encodeURIComponent(`Hi, I'm interested in the ${product} from your RUGANGO250 store. Can you provide more information?`);
+            window.open(`https://wa.me/250724285570?text=${message}`, '_blank');
+        });
+        
+        // Poe chat button functionality
+        poeChatButton.addEventListener('click', async () => {
+            try {
+                const product = productName.textContent;
+                
+                // Show loading state
+                poeButtonText.classList.add('hidden');
+                poeLoading.classList.remove('hidden');
+                
+                // Send message using Poe Embed API
+                if (window.Poe) {
+                    await window.Poe.sendUserMessage(
+                        `@Claude-3.7-Sonnet I'm interested in the ${product} from RUGANGO250. Can you tell me more about it? I'd like to know about the price, available sizes, materials, and delivery options.`,
+                        { openChat: true }
+                    );
+                    
+                    // Close the modal after sending
+                    contactModal.classList.add('hidden');
+                } else {
+                    throw new Error("Poe API not available");
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("Sorry, there was an error connecting to our chat system. Please try WhatsApp instead.");
+            } finally {
+                // Reset button state
+                poeButtonText.classList.remove('hidden');
+                poeLoading.classList.add('hidden');
+            }
+        });
+        
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                // Close mobile menu if open
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
