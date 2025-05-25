@@ -1,1 +1,101 @@
-contact me on watsapp 0799379271
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        whatsapp: '#25D366'
+                    }
+                }
+            }
+        }
+        
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
+    <div class="container mx-auto p-4 max-w-md flex-grow flex flex-col justify-center">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h1 class="text-2xl font-bold mb-4 text-center text-primary dark:text-primary">Contact Me</h1>
+            
+            <div class="space-y-6">
+                <div class="flex items-center justify-center">
+                    <div class="h-24 w-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-4xl text-gray-500 dark:text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-lg font-medium">WhatsApp: 0799379271</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Click the button below to contact me on WhatsApp</p>
+                </div>
+                
+                <div class="flex justify-center">
+                    <a href="https://wa.me/0799379271" target="_blank" class="flex items-center gap-2 bg-whatsapp hover:bg-opacity-90 text-white px-6 py-3 rounded-lg transition duration-300 font-medium">
+                        <i class="fab fa-whatsapp text-xl"></i>
+                        Contact on WhatsApp
+                    </a>
+                </div>
+                
+                <!-- Optional contact form -->
+                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h2 class="text-xl font-semibold mb-4 text-center">Send a Message</h2>
+                    <form id="contactForm" class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium mb-1">Name</label>
+                            <input type="text" id="name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-base" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium mb-1">Email</label>
+                            <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-base" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium mb-1">Message</label>
+                            <textarea id="message" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-base" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-lg transition duration-300">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const message = document.getElementById('message').value;
+            
+            // Generate WhatsApp message with form data
+            const whatsappMessage = `Hello, my name is ${name}. ${message}`;
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            
+            // Open WhatsApp with pre-filled message
+            window.open(`https://wa.me/0799379271?text=${encodedMessage}`, '_blank');
+            
+            // Reset form
+            this.reset();
+        });
+    </script>
+</body>
+</html>
